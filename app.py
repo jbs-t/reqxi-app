@@ -1,23 +1,26 @@
 import streamlit as st
 import pandas as pd
 import requests
+import os
 
 # 1. PAGE SETUP
 st.set_page_config(page_title="REQXI PRO", layout="wide")
 
-# 2. STABLE STEALTH CSS (Recalibrated for 2026 Streamlit)
+# 2. CALIBRATED CSS (Targeted specifically to hide only Streamlit UI)
 st.markdown("""
     <style>
-    /* HIDE TOP BARS WITHOUT BREAKING CONTENT */
-    header, [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton {
+    /* Targeted removal of Streamlit elements */
+    [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton {
         display: none !important;
-        visibility: hidden;
     }
     footer {visibility: hidden;}
 
     /* THEME: NEON CYAN + DEEP BLACK */
     .main { background-color: #010408 !important; }
     
+    /* Ensure Tab Content is Visible */
+    div[data-testid="stVerticalBlock"] { opacity: 1 !important; }
+
     [data-testid="stMetric"] {
         background: rgba(0, 255, 255, 0.04);
         border: 1px solid #00ffff;
@@ -29,15 +32,6 @@ st.markdown("""
     h1, h2, h3, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
     [data-testid="stMetricValue"] > div { color: #ffffff !important; }
     
-    /* BUTTON STYLING */
-    .stButton>button {
-        background-color: #00ffff;
-        color: black;
-        font-weight: bold;
-        border-radius: 8px;
-        border: none;
-    }
-
     /* FOOTER LINK */
     .footer-link {
         color: #00ffff !important;
@@ -54,14 +48,14 @@ st.markdown("""
 # 3. BRANDING HEADER
 st.image("reqxi.jpg", width=550)
 
-# 4. NAVIGATION TABS
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Intelligence", "🛠️ Careers", "🤝 Donations", "🛡️ Risk Monitor"])
+# 4. NAVIGATION TABS (Explicitly defined)
+tab_names = ["📊 Intelligence", "🛠️ Careers", "🤝 Donations", "🛡️ Risk"]
+t1, t2, t3, t4 = st.tabs(tab_names)
 
-with tab1:
+with t1:
     st.subheader("🌐 Live Regional Feed")
     def get_data(lat, lon):
         try:
-            # Weather and AQI data
             w = requests.get(f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&temperature_unit=fahrenheit").json()
             a = requests.get(f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&hourly=us_aqi").json()
             return {"t": w['current_weather']['temperature'], "a": a['hourly']['us_aqi'][0]}
@@ -80,44 +74,36 @@ with tab1:
             city = names[i+j]
             lat, lon = cities[city]
             d = get_data(lat, lon)
-            with cols[j]:
-                st.metric(city, f"{d['t']}°F", f"AQI: {d['a']}")
+            with cols[j]: st.metric(city, f"{d['t']}°F", f"AQI: {d['a']}")
 
-with tab2:
-    st.subheader("🚀 Join the REQXI Team")
-    st.markdown("### **Hiring: Data Engineer (L3)**")
-    st.write("Specializing in real-time ETL pipelines and hazard mitigation analytics.")
-    st.markdown("""
-    **Apply via the JBS-T Portal:**
-    [Submit Application Here](https://www.jbs-t.com)
-    """)
+with t2:
+    st.subheader("🚀 Careers")
+    st.write("**Hiring: Data Engineer (L3)**")
+    st.markdown("[Submit Application Here](https://www.jbs-t.com)")
 
-with tab3:
-    st.subheader("🤝 Support Our Research")
-    st.write("Scan the QR code or click the button below to donate via Cash App.")
-    
-    # Displays the QR code you provided
-    st.image("$jbstpay.svg", width=300)
+with t3:
+    st.subheader("🤝 Support Research")
+    # Display QR Code safely
+    qr_path = "qr_code.svg"
+    if os.path.exists(qr_path):
+        st.image(qr_path, width=250)
     
     st.markdown("""
         <a href="https://cash.app/$jbstpay" target="_blank">
-            <button style="background-color:#00ffff; color:black; border:none; padding:15px 30px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">
+            <button style="background-color:#00ffff; color:black; border:none; padding:15px 30px; border-radius:8px; font-weight:bold; cursor:pointer;">
                 💸 Click to Donate via Cash App
             </button>
         </a>
     """, unsafe_allow_html=True)
 
-with tab4:
-    st.subheader("🛡️ Resilience Analytics")
-    resilience_data = {
-        "Region": ["Miami, FL", "Charleston, SC", "Fort Worth, TX", "Minneapolis, MN"],
-        "Flood Risk": ["Severe", "Extreme", "Low", "Low"],
-        "Grid Stability": ["Watch", "Coastal Risk", "High Capacity", "Winter Load"]
-    }
-    st.table(pd.DataFrame(resilience_data))
+with t4:
+    st.subheader("🛡️ Risk Analytics")
+    risk_df = pd.DataFrame({
+        "Region": ["Miami", "Charleston", "Fort Worth"],
+        "Threat": ["Hurricane/Flood", "Coastal Erosion", "Severe Weather"]
+    })
+    st.table(risk_df)
 
 st.divider()
-
-# 5. HYPERLINKED FOOTER
-st.markdown('<div style="text-align:center;"><a href="https://www.jbs-t.com" target="_blank" class="footer-link">PARTNERED COMPANY: WWW.JBS-T.COM</a></div>', unsafe_allow_html=True)
-st.caption("Confidential // REQXI IT Consulting & Data Research")
+st.markdown('<div style="text-align:center;"><a href="https://www.jbs-t.com" target="_blank" class="footer-link">WWW.JBS-T.COM</a></div>', unsafe_allow_html=True)
+st.caption("Confidential // REQXI IT Consulting")
