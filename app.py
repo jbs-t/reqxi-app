@@ -3,93 +3,110 @@ import pandas as pd
 import requests
 
 # 1. PAGE SETUP
-st.set_page_config(page_title="REQXI PRO", layout="wide")
+st.set_page_config(page_title="REQXI PRO | Intelligence Terminal", layout="wide")
 
-# 2. CALIBRATED STEALTH CSS (Hides branding, keeps content)
+# 2. STEALTH CSS (Hides branding + Corporate Styling)
 st.markdown("""
     <style>
-    /* HIDE TOP BAR AND BUTTONS WITHOUT BREAKING CONTENT */
-    [data-testid="stHeader"] {display: none;}
-    [data-testid="stToolbar"] {display: none;}
-    .stDeployButton {display: none;}
+    /* HIDE STREAMLIT BRANDING */
+    [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton {display: none;}
     footer {visibility: hidden;}
     
-    /* FIX TOP PADDING GAP */
-    .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
-
     /* THEME: NEON CYAN + DEEP BLACK */
     .main { background-color: #010408; }
     [data-testid="stMetric"] {
         background: rgba(0, 255, 255, 0.04);
         border: 1px solid #00ffff;
         border-radius: 10px;
-        padding: 10px;
     }
-    h1, h2, h3, p, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
+    
+    /* TEXT COLORS */
+    h1, h2, h3, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
     [data-testid="stMetricValue"] > div { color: #ffffff !important; }
-    .footer-text { text-align: center; color: #00ffff; padding: 20px; opacity: 0.6; }
+    
+    /* TABS STYLING */
+    .stTabs [data-baseweb="tab-list"] { background-color: transparent; }
+    .stTabs [data-baseweb="tab"] { color: #00ffff; border-bottom: 2px solid transparent; }
+    .stTabs [data-baseweb="tab"]:hover { color: #ffffff; }
+    .stTabs [aria-selected="true"] { color: #ffffff !important; border-bottom: 2px solid #00ffff !important; }
+
+    /* FOOTER */
+    .footer-container { text-align: center; padding: 40px; }
+    .footer-link { color: #00ffff !important; text-decoration: none; font-weight: bold; border: 1px solid #00ffff; padding: 10px 20px; border-radius: 5px; }
+    .footer-link:hover { background: rgba(0, 255, 255, 0.1); }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. BRANDING HEADER (Size optimized for mobile)
+# 3. BRANDING HEADER
 st.image("reqxi.jpg", width=550)
-st.caption("REQXI INTELLIGENCE // REAL-TIME OPTIMIZATION")
+
+# 4. NAVIGATION TABS
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Intelligence Feed", "🛠️ Careers", "🤝 Donations", "🛡️ Risk Monitor"])
+
+with tab1:
+    st.subheader("🌐 Live Regional Feed")
+    
+    def get_data(lat, lon):
+        try:
+            w = requests.get(f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&temperature_unit=fahrenheit").json()
+            a = requests.get(f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&hourly=us_aqi").json()
+            return {"t": w['current_weather']['temperature'], "a": a['hourly']['us_aqi'][0]}
+        except: return {"t": "--", "a": "--"}
+
+    cities = {
+        "Miami, FL": (25.76, -80.19), "Charlotte, NC": (35.22, -80.84), "Charleston, SC": (32.77, -79.93),
+        "Toronto, ON": (43.65, -79.38), "Minneapolis, MN": (44.97, -93.26), "Fort Worth": (32.75, -97.33),
+        "New York": (40.71, -74.00), "Chicago": (41.87, -87.62), "Los Angeles": (34.05, -118.24)
+    }
+
+    names = list(cities.keys())
+    for i in range(0, 9, 3):
+        cols = st.columns(3)
+        for j in range(3):
+            city = names[i+j]
+            lat, lon = cities[city]
+            d = get_data(lat, lon)
+            with cols[j]: st.metric(city, f"{d['t']}°F", f"AQI: {d['a']}")
+
+with tab2:
+    st.subheader("🚀 Careers at REQXI")
+    st.markdown("### **Hiring: Data Engineer (L3)**")
+    st.write("**Location:** Remote / Hybrid (Fort Worth Hub)")
+    st.markdown("""
+    **Core Responsibilities:**
+    * Architecting real-time ETL pipelines for grid-scale energy data.
+    * Maintaining distributed Air Quality and Weather API integrations.
+    * Developing high-concurrency data models for disaster resilience analytics.
+    
+    **To Apply:** Send your CV and GitHub profile to the JBS-T portal.
+    """)
+    if st.button("Submit Inquiry"):
+        st.success("Application link generated. Redirecting to JBS-T Secure Portal...")
+
+with tab3:
+    st.subheader("🤝 Support Our Research")
+    st.write("Your donations power our open-access disaster resilience and air quality research for underserved communities.")
+    
+    amount = st.radio("Select Donation Amount", ["$25", "$50", "$100", "Custom"])
+    if st.button("Proceed to Secure Payment"):
+        st.info("Directing to Secure Stripe/PayPal Gateway...")
+
+with tab4:
+    st.subheader("🛡️ Resilience Monitor")
+    resilience_data = {
+        "Region": ["Miami", "Charlotte", "Charleston", "Minneapolis", "Fort Worth"],
+        "Flood Risk": ["Severe", "Moderate", "Extreme", "Low", "Low"],
+        "Grid Status": ["Watch", "Stable", "Coastal Risk", "Winter Load", "Secure"]
+    }
+    st.table(pd.DataFrame(resilience_data))
 
 st.divider()
 
-# 4. ENERGY COST ANALYTICS
-st.subheader("💰 Energy Market Efficiency (LMP)")
-cost_data = {
-    "Market Node": ["Texas (ERCOT)", "PJM (East)", "California (CAISO)", "New York (ISO)", "Midwest (MISO)"],
-    "Current $/MWh": ["$24.10", "$48.50", "$12.00", "$52.10", "$31.40"],
-    "Savings Window": ["02:00-06:00", "01:00-05:00", "11:00-15:00", "03:00-05:00", "23:00-04:00"],
-    "Load": ["Low", "High", "Surplus", "Peak", "Stable"]
-}
-st.table(pd.DataFrame(cost_data))
-
-st.divider()
-
-# 5. RISK MONITOR
-st.subheader("🛡️ Infrastructure Resilience Monitor")
-resilience_data = {
-    "Region": ["Miami, FL", "Charlotte, NC", "Charleston, SC", "Minneapolis, MN", "Fort Worth"],
-    "Flood Risk": ["Severe", "Moderate", "Extreme", "Low", "Low"],
-    "Grid Stability": ["Watch", "Stable", "Coastal Risk", "Winter Load", "High Capacity"]
-}
-st.table(pd.DataFrame(resilience_data))
-
-st.divider()
-
-# 6. LIVE REGIONAL HUB FEED (9-City)
-st.subheader("🌐 LIVE REGIONAL FEED")
-
-def get_data(lat, lon):
-    try:
-        w = requests.get(f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&temperature_unit=fahrenheit").json()
-        a = requests.get(f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&hourly=us_aqi").json()
-        return {"t": w['current_weather']['temperature'], "a": a['hourly']['us_aqi'][0]}
-    except: return {"t": "--", "a": "--"}
-
-cities = {
-    "Miami, FL": (25.76, -80.19), "Charlotte, NC": (35.22, -80.84), "Charleston, SC": (32.77, -79.93),
-    "Toronto, ON": (43.65, -79.38), "Minneapolis, MN": (44.97, -93.26), "Fort Worth": (32.75, -97.33),
-    "New York": (40.71, -74.00), "Chicago": (41.87, -87.62), "Los Angeles": (34.05, -118.24)
-}
-
-names = list(cities.keys())
-for i in range(0, 9, 3):
-    cols = st.columns(3)
-    for j in range(3):
-        city = names[i+j]
-        lat, lon = cities[city]
-        d = get_data(lat, lon)
-        with cols[j]: st.metric(city, f"{d['t']}°F", f"AQI: {d['a']}")
-
-st.divider()
-st.markdown('<div class="footer-text">PARTNERED COMPANY: JBS-T.COM</div>', unsafe_allow_html=True)
+# 5. HYPERLINKED PARTNERSHIP FOOTER
+st.markdown(
+    '<div class="footer-container">'
+    '<a href="https://www.jbs-t.com" target="_blank" class="footer-link">PARTNERED COMPANY: WWW.JBS-T.COM</a>'
+    '</div>', 
+    unsafe_allow_html=True
+)
 st.caption("Confidential // REQXI IT Consulting & Data Research")
