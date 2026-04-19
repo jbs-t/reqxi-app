@@ -6,21 +6,16 @@ import os
 # 1. PAGE SETUP
 st.set_page_config(page_title="REQXI PRO", layout="wide")
 
-# 2. CALIBRATED CSS (Targeted specifically to hide only Streamlit UI)
+# 2. CLEAN STEALTH CSS (No Parent Branding)
 st.markdown("""
     <style>
-    /* Targeted removal of Streamlit elements */
-    [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton {
-        display: none !important;
-    }
-    footer {visibility: hidden;}
+    /* HIDE ALL STREAMLIT UI */
+    [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton { display: none !important; }
+    footer { visibility: hidden; }
 
     /* THEME: NEON CYAN + DEEP BLACK */
     .main { background-color: #010408 !important; }
     
-    /* Ensure Tab Content is Visible */
-    div[data-testid="stVerticalBlock"] { opacity: 1 !important; }
-
     [data-testid="stMetric"] {
         background: rgba(0, 255, 255, 0.04);
         border: 1px solid #00ffff;
@@ -32,25 +27,16 @@ st.markdown("""
     h1, h2, h3, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
     [data-testid="stMetricValue"] > div { color: #ffffff !important; }
     
-    /* FOOTER LINK */
-    .footer-link {
-        color: #00ffff !important;
-        text-decoration: none;
-        font-weight: bold;
-        border: 1px solid #00ffff;
-        padding: 12px 24px;
-        border-radius: 6px;
-        display: inline-block;
-    }
+    /* PROGRESS BAR COLOR */
+    .stProgress > div > div > div > div { background-color: #00ffff; }
     </style>
     """, unsafe_allow_html=True)
 
 # 3. BRANDING HEADER
 st.image("reqxi.jpg", width=550)
 
-# 4. NAVIGATION TABS (Explicitly defined)
-tab_names = ["📊 Intelligence", "🛠️ Careers", "🤝 Donations", "🛡️ Risk"]
-t1, t2, t3, t4 = st.tabs(tab_names)
+# 4. NAVIGATION TABS
+t1, t2, t3, t4 = st.tabs(["📊 Intelligence", "🚀 Careers", "🤝 Donations", "🛡️ Risk"])
 
 with t1:
     st.subheader("🌐 Live Regional Feed")
@@ -78,11 +64,17 @@ with t1:
 
 with t2:
     st.subheader("🚀 Careers")
-    st.write("**Hiring: Data Engineer (L3)**")
-    st.markdown("[Submit Application Here](https://www.jbs-t.com)")
+    st.write("**Current Opening: Data Engineer (L3)**")
+    st.info("Direct recruitment is currently handled via LinkedIn. Submit CVs through the internal message portal.")
 
 with t3:
-    st.subheader("🤝 Support Research")
+    st.subheader("🤝 Support Our Research")
+    
+    # RESEARCH GOAL TRACKER
+    st.write("**Active Goal: Dedicated Weather Node (Bedford, TX Hub)**")
+    st.progress(0.65) # 65% complete
+    st.caption("$975 raised of $1,500 goal")
+    
     # Display QR Code safely
     qr_path = "qr_code.svg"
     if os.path.exists(qr_path):
@@ -95,6 +87,8 @@ with t3:
             </button>
         </a>
     """, unsafe_allow_html=True)
+    
+    st.success("Thank you for supporting open-access disaster data.")
 
 with t4:
     st.subheader("🛡️ Risk Analytics")
@@ -105,5 +99,4 @@ with t4:
     st.table(risk_df)
 
 st.divider()
-st.markdown('<div style="text-align:center;"><a href="https://www.jbs-t.com" target="_blank" class="footer-link">WWW.JBS-T.COM</a></div>', unsafe_allow_html=True)
-st.caption("Confidential // REQXI IT Consulting")
+st.caption("Confidential // REQXI IT Consulting & Data Research Operations")
