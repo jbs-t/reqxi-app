@@ -6,7 +6,7 @@ import os
 # 1. PAGE SETUP
 st.set_page_config(page_title="REQXI PRO", layout="wide")
 
-# 2. CLEAN STEALTH CSS (No Parent Branding)
+# 2. CLEAN STEALTH CSS
 st.markdown("""
     <style>
     /* HIDE ALL STREAMLIT UI */
@@ -64,16 +64,24 @@ with t1:
 
 with t2:
     st.subheader("🚀 Careers")
-    st.write("**Current Opening: Data Engineer (L3)**")
-    st.info("Direct recruitment is currently handled via LinkedIn. Submit CVs through the internal message portal.")
+    st.markdown("### **Senior Data Engineer (L3)**")
+    st.write("**Compensation:** Based on Experience")
+    st.markdown("""
+    **Core Responsibilities:**
+    * Scaling real-time ETL pipelines for grid-scale data.
+    * Lead architect for automated hazard mitigation modeling.
+    * Managing distributed environmental API integrations.
+
+    **Apply:** Send resume to **justin@jbs-t.com**
+    """)
 
 with t3:
     st.subheader("🤝 Support Our Research")
     
-    # RESEARCH GOAL TRACKER
-    st.write("**Active Goal: Dedicated Weather Node (Bedford, TX Hub)**")
-    st.progress(0.65) # 65% complete
-    st.caption("$975 raised of $1,500 goal")
+    # RESEARCH GOAL TRACKER (Removed Dollar Amounts)
+    st.write("**Current Phase: Dedicated Infrastructure Expansion**")
+    st.progress(0.65) 
+    st.caption("Strategic Research Goal Progress")
     
     # Display QR Code safely
     qr_path = "qr_code.svg"
@@ -87,14 +95,13 @@ with t3:
             </button>
         </a>
     """, unsafe_allow_html=True)
-    
-    st.success("Thank you for supporting open-access disaster data.")
+    st.success("Your support fuels open-access disaster intelligence.")
 
 with t4:
     st.subheader("🛡️ Risk Analytics")
     risk_df = pd.DataFrame({
         "Region": ["Miami", "Charleston", "Fort Worth"],
-        "Threat": ["Hurricane/Flood", "Coastal Erosion", "Severe Weather"]
+        "Primary Threat": ["Hurricane/Flood", "Coastal Surge", "Severe Storms"]
     })
     st.table(risk_df)
 
