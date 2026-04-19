@@ -2,123 +2,93 @@ import streamlit as st
 import pandas as pd
 import requests
 
-# 1. PAGE SETUP (The Foundation)
+# 1. PAGE SETUP
 st.set_page_config(
-    page_title="REQXI Grid Intelligence",
-    page_icon="⚡",
+    page_title="REQXI PRO | North America Data Feed",
     layout="wide",
-    initial_sidebar_state="collapsed" # Starts collapsed for full-screen feel
+    initial_sidebar_state="collapsed"
 )
 
-# 2. THE REQXI "STEALTH" THEME (Million-Dollar Styling)
-# This CSS matches the deep background and neon text from your new image.
+# 2. REQXI STEALTH CSS (Neon Cyan + Deep Black)
 st.markdown("""
     <style>
-    /* 1. The Deep Background */
     .main { background-color: #010408; }
-    
-    /* 2. Overriding standard text to be Neon Cyan */
-    h1, h2, h3, p, label, .stMarkdown, .stText, [data-testid="stHeader"] { 
-        color: #00ffff !important; 
-        font-family: 'SF Pro Display', 'Inter', sans-serif;
-    }
-    
-    /* 3. High-End Metric Card Styling (Neon Cyan Borders) */
     [data-testid="stMetric"] {
-        background: rgba(0, 255, 255, 0.03); /* Subtle background glow */
+        background: rgba(0, 255, 255, 0.03);
         border: 1px solid #00ffff;
-        box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.2);
+        box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.15);
         border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
     }
-    
-    /* Metric label styling */
-    [data-testid="stMetricLabel"] > div { color: #00ffff !important; font-size: 1rem; }
-    /* Metric value styling */
-    [data-testid="stMetricValue"] > div { color: #ffffff !important; font-size: 2rem; font-weight: bold;}
-    
-    /* 4. Selectbox / Dropdown Styling (making them stealthy) */
-    .stSelectbox div[data-baseweb="select"] > div {
-        background-color: #0d1117;
-        border: 1px solid #00ffff;
-        color: #00ffff;
-    }
-    
-    /* 5. Custom Button Styling */
-    .stButton>button {
-        background-color: #010408;
-        color: #00ffff;
-        border: 1px solid #00ffff;
-        border-radius: 5px;
-        font-size: 1rem;
-        width: 100%;
-    }
-    .stButton>button:hover {
-        background-color: rgba(0, 255, 255, 0.1);
-        border: 1px solid #00ffff;
-    }
-
-    /* 6. Clean Divider */
+    h1, h2, h3, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
+    [data-testid="stMetricValue"] > div { color: #ffffff !important; }
     hr { border-color: #00ffff; opacity: 0.3; }
-    
-    /* Sidebar Styling */
-    section[data-testid="stSidebar"] { background-color: #010408; border-right: 1px solid #00ffff; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. WEATHER ENGINE (Fahrenheit, Live Open-Meteo)
-def get_weather(lat, lon):
-    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&temperature_unit=fahrenheit"
+# 3. DATA ENGINES (Weather + Air Quality)
+def get_city_data(lat, lon):
+    # Fetching Weather (F) and Air Quality (US AQI)
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&air_quality=us_aqi&temperature_unit=fahrenheit"
     try:
-        response = requests.get(url).json()
-        return response['current_weather']
+        data = requests.get(url).json()
+        return {
+            "temp": data['current_weather']['temperature'],
+            "wind": data['current_weather']['windspeed'],
+            "aqi": data.get('air_quality', {}).get('us_aqi', "N/A")
+        }
     except:
-        return {"temperature": "N/A", "windspeed": "N/A"}
+        return {"temp": "N/A", "wind": "N/A", "aqi": "N/A"}
 
-# 4. MAIN HEADER (The Hero)
-# I am assuming your new image is uploaded as dashboardrex.jpg
-st.markdown("<h1 style='text-align: center; color: #00ffff;'>REQXI</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #ffffff;'>NORTH AMERICA DATA FEED</p>", unsafe_allow_html=True)
-
+# 4. TOP HERO VISUAL
 try:
-    st.image("dashboardrex.jpg", use_container_width=True)
+    st.image("reqxi_stealth.jpg", use_container_width=True)
 except:
-    st.info("⚠️ Action Required: Upload your new dashboard image to GitHub and name it 'dashboardrex.jpg'. Only then will it appear here.")
+    st.info("Point code to 'reqxi_stealth.jpg' and upload to GitHub.")
 
 st.divider()
 
-# 5. SELECT HUB & LIVE DATA (Fahrenheit Weather)
-st.subheader("⚡ Control Hub")
-hub_choice = st.selectbox(
-    "Select Active Sector", 
-    ["Fort Worth (Tarrant)", "New York (NYC)", "Los Angeles (LAX)"]
-)
+# 5. ENERGY GRID OVERVIEW (Simulated Enterprise Feed)
+st.subheader("⚡ LIVE GRID PERFORMANCE")
+e1, e2, e3 = st.columns(3)
+with e1:
+    st.metric("Total Load", "420 GW", "+1.2%")
+with e2:
+    st.metric("Grid Price", "$37.46", "-0.5%")
+with e3:
+    st.metric("Active Nodes", "132", "STABLE")
 
-# Hub Coordinates (Lat, Lon)
-coords = {
-    "Fort Worth (Tarrant)": (32.75, -97.33), 
-    "New York (NYC)": (40.71, -74.00), 
-    "Los Angeles (LAX)": (34.05, -118.24)
+st.divider()
+
+# 6. TOP 9 USA CITIES: WEATHER & AIR QUALITY
+st.subheader("🌐 REGIONAL DATA FEED (Top 9 Hubs)")
+
+# City Dictionary: Name -> (Lat, Lon)
+cities = {
+    "New York": (40.71, -74.00),
+    "Los Angeles": (34.05, -118.24),
+    "Chicago": (41.87, -87.62),
+    "Houston": (29.76, -95.36),
+    "Phoenix": (33.44, -112.07),
+    "Philadelphia": (39.95, -75.16),
+    "San Antonio": (29.42, -98.49),
+    "San Diego": (32.71, -117.16),
+    "Fort Worth": (32.75, -97.33)
 }
 
-lat, lon = coords[hub_choice]
-weather = get_weather(lat, lon)
+# Creating 3 rows of 3 columns
+rows = [list(cities.keys())[i:i+3] for i in range(0, 9, 3)]
 
-# 6. LIVE METRIC CARDS (Matching your Design)
-st.subheader("📊 Live Grid Analytics (North America Cluster)")
-col1, col2, col3 = st.columns(3)
+for row in rows:
+    cols = st.columns(3)
+    for i, city_name in enumerate(row):
+        lat, lon = cities[city_name]
+        data = get_city_data(lat, lon)
+        with cols[i]:
+            st.write(f"### {city_name}")
+            st.metric("Temp", f"{data['temp']}°F")
+            st.write(f"💨 Wind: {data['wind']} km/h")
+            # Logic for AQI color-coding could be added here later
+            st.write(f"🌫️ AQI: {data['aqi']}")
+    st.divider()
 
-with col1:
-    st.metric("Avg Load", "420 GW", "+1.2%")
-with col2:
-    # Live Fahrenheit Weather
-    st.metric("Sector Temp", f"{weather['temperature']}°F", f"{hub_choice}")
-with col3:
-    st.metric("Grid Stability", "99.99%", "SECURE")
-
-st.divider()
-
-# 7. FOOTER VISUAL
-st.markdown("<h1 style='text-align: center; color: #00ffff;'>REQXI</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #ffffff;'>IT CONSULTING & DATA RESEARCH</p>", unsafe_allow_html=True)
+st.caption("REQXI PRO Terminal // Stealth Interface v2.0")
