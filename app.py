@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 
 # 1. PAGE SETUP
-st.set_page_config(page_title="REQXI Analytics | 2026 Data", layout="wide")
+st.set_page_config(page_title="REQXI Analytics | Resilience & Risk", layout="wide")
 
 # 2. THEME (Deep Black + Neon Cyan)
 st.markdown("""
@@ -23,36 +23,36 @@ st.markdown("""
 
 # 3. BRANDING HEADER
 st.image("reqxi.jpg", width=600)
-st.caption("REQXI INTELLIGENCE TERMINAL // 2026 ANALYTICS")
+st.caption("REQXI INTELLIGENCE // DISASTER RISK & AIR ANALYTICS")
 
-# 4. TOP CONSUMPTION HUBS (Data Centers & Industrial)
-st.subheader("📊 2026 High-Consumption Hubs")
-st.write("Cities with the highest projected load due to Data Center alley and AI infrastructure.")
+# 4. DISASTER RISK ANALYTICS (FEMA-Grade Insights)
+st.subheader("🛡️ 2026 Resilience & Hazard Mitigation")
+st.write("Top regions for infrastructure safety based on FEMA Community Rating System (CRS) and lower wildfire/flood risk.")
 
-c1, c2, c3 = st.columns(3)
-with c1: st.metric("N. VIRGINIA (Loudoun)", "2.6 GW", "+18% Load")
-with c2: st.metric("DALLAS-FT WORTH", "653 MW", "Low Price")
-with c3: st.metric("NEW YORK METRO", "517 MW", "Critical")
-
-st.divider()
-
-# 5. CLEAN DATA HAVENS (Top Sustainable Cities)
-st.subheader("🌿 2026 Clean Data Havens")
-st.write("Recommended regions for green data infrastructure based on Air Quality (PM2.5) and Renewable Access.")
-
-# Analytics Dataframe for Clean Cities
-clean_cities_data = {
-    "City": ["Honolulu, HI", "Anchorage, AK", "Portland, OR", "Seattle, WA", "Casper, WY"],
-    "AQI (PM2.5)": ["4.1 µg/m³", "3.1 µg/m³", "4.2 µg/m³", "4.1 µg/m³", "4.0 µg/m³"],
-    "Energy Source": ["Solar/Wind", "Hydro/Wind", "Hydroelectric", "Hydro/Wind", "Wind/Grid"],
-    "Market Fit": ["Secondary", "Strategic", "Primary", "Primary", "Emerging"]
+# Table for Resilience Data
+resilience_data = {
+    "Hub City": ["Seattle, WA", "Louisville, KY", "Baltimore, MD", "Charlotte, NC", "Columbus, OH"],
+    "FEMA NFIP Discount": ["40%", "35%", "25%", "15%", "N/A"],
+    "Primary Risk": ["Seismic", "Flood", "Coastal Flood", "Inland Flood", "Tornado"],
+    "Mitigation Status": ["Verified", "Verified", "Active", "Active", "Active"]
 }
-st.table(pd.DataFrame(clean_cities_data))
+st.table(pd.DataFrame(resilience_data))
 
 st.divider()
 
-# 6. REGIONAL DATA FEED (Live)
-st.subheader("🌐 LIVE CROSS-CONTINENT FEED")
+# 5. HIGH-POLLUTION MONITOR (Current Trends)
+st.subheader("⚠️ High-Pollution Impact Zones")
+st.write("Regions seeing worsening air quality trends in 2026 due to topography, industry, or regulatory shifts.")
+
+p1, p2, p3 = st.columns(3)
+with p1: st.metric("Bakersfield, CA", "AQI Trend", "Worst US PM2.5")
+with p2: st.metric("Houston, TX", "Ozone Alert", "Worsening")
+with p3: st.metric("Maricopa, AZ", "PM10 Risk", "High Dust")
+
+st.divider()
+
+# 6. LIVE CROSS-CONTINENT FEED
+st.subheader("🌐 LIVE REGIONAL DATA")
 
 def get_data(lat, lon):
     try:
@@ -61,7 +61,7 @@ def get_data(lat, lon):
         return {"t": w['current_weather']['temperature'], "a": a['hourly']['us_aqi'][0]}
     except: return {"t": "N/A", "a": "N/A"}
 
-# 9-City Diverse Split
+# 9-City Hubs
 cities = {
     "Miami, FL": (25.76, -80.19), "Charlotte, NC": (35.22, -80.84), "Charleston, SC": (32.77, -79.93),
     "Toronto, ON": (43.65, -79.38), "Minneapolis, MN": (44.97, -93.26), "Fort Worth": (32.75, -97.33),
