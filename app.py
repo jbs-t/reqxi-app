@@ -3,9 +3,9 @@ import pandas as pd
 import requests
 
 # 1. PAGE SETUP
-st.set_page_config(page_title="REQXI Analytics | Resilience & Risk", layout="wide")
+st.set_page_config(page_title="REQXI PRO | FEMA+ Resilience", layout="wide")
 
-# 2. THEME (Deep Black + Neon Cyan)
+# 2. STEALTH CSS
 st.markdown("""
     <style>
     .main { background-color: #010408; }
@@ -23,36 +23,25 @@ st.markdown("""
 
 # 3. BRANDING HEADER
 st.image("reqxi.jpg", width=600)
-st.caption("REQXI INTELLIGENCE // DISASTER RISK & AIR ANALYTICS")
+st.caption("REQXI INTELLIGENCE // BEYOND FEMA: ADVANCED RISK MODELING")
 
-# 4. DISASTER RISK ANALYTICS (FEMA-Grade Insights)
-st.subheader("🛡️ 2026 Resilience & Hazard Mitigation")
-st.write("Top regions for infrastructure safety based on FEMA Community Rating System (CRS) and lower wildfire/flood risk.")
+# 4. FEMA VS. PRIVATE RISK (The "Better" Data Section)
+st.subheader("🛡️ Property-Level Resilience Metrics (First Street Model)")
+st.write("Cross-referencing FEMA historical zones with 2026 Climate-Adjusted Risk Scores.")
 
-# Table for Resilience Data
-resilience_data = {
-    "Hub City": ["Seattle, WA", "Louisville, KY", "Baltimore, MD", "Charlotte, NC", "Columbus, OH"],
-    "FEMA NFIP Discount": ["40%", "35%", "25%", "15%", "N/A"],
-    "Primary Risk": ["Seismic", "Flood", "Coastal Flood", "Inland Flood", "Tornado"],
-    "Mitigation Status": ["Verified", "Verified", "Active", "Active", "Active"]
+# Analytics Data: Comparing FEMA to Modern High-Res Models
+risk_comparison = {
+    "Hub City": ["Miami, FL", "Charleston, SC", "Houston, TX", "New York, NY", "Chicago, IL"],
+    "FEMA Zone": ["High", "High", "Moderate", "Moderate", "Low"],
+    "First Street Factor": ["9/10 (Extreme)", "10/10 (Extreme)", "8/10 (Severe)", "6/10 (Moderate)", "4/10 (Minor)"],
+    "Infrastructure Threat": ["Storm Surge", "Sea Level Rise", "Pluvial Flood", "Coastal Surge", "Heat Stress"]
 }
-st.table(pd.DataFrame(resilience_data))
+st.table(pd.DataFrame(risk_comparison))
 
 st.divider()
 
-# 5. HIGH-POLLUTION MONITOR (Current Trends)
-st.subheader("⚠️ High-Pollution Impact Zones")
-st.write("Regions seeing worsening air quality trends in 2026 due to topography, industry, or regulatory shifts.")
-
-p1, p2, p3 = st.columns(3)
-with p1: st.metric("Bakersfield, CA", "AQI Trend", "Worst US PM2.5")
-with p2: st.metric("Houston, TX", "Ozone Alert", "Worsening")
-with p3: st.metric("Maricopa, AZ", "PM10 Risk", "High Dust")
-
-st.divider()
-
-# 6. LIVE CROSS-CONTINENT FEED
-st.subheader("🌐 LIVE REGIONAL DATA")
+# 5. LIVE REGIONAL DATA (9-City Grid)
+st.subheader("🌐 LIVE REGIONAL FEED")
 
 def get_data(lat, lon):
     try:
@@ -61,7 +50,6 @@ def get_data(lat, lon):
         return {"t": w['current_weather']['temperature'], "a": a['hourly']['us_aqi'][0]}
     except: return {"t": "N/A", "a": "N/A"}
 
-# 9-City Hubs
 cities = {
     "Miami, FL": (25.76, -80.19), "Charlotte, NC": (35.22, -80.84), "Charleston, SC": (32.77, -79.93),
     "Toronto, ON": (43.65, -79.38), "Minneapolis, MN": (44.97, -93.26), "Fort Worth": (32.75, -97.33),
