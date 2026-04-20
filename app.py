@@ -1,148 +1,117 @@
 import streamlit as st
 import pandas as pd
 import requests
+import pydeck as pdk
 import os
 
 # 1. PAGE SETUP
 st.set_page_config(page_title="REQXI PRO", layout="wide")
 
-# 2. MELANIN-OPTIMIZED CSS (Warm, Deep, & Gold)
+# 2. THE SIGNATURE LOOK (Cyan & Black)
 st.markdown("""
     <style>
     header, [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton {display: none;}
     footer {visibility: hidden;}
+    .main { background-color: #010408; }
     
-    /* BASE: Warm Charcoal for better eye comfort */
-    .main { background-color: #0A0A0A; }
-    
-    /* CARDS: Warm Mocha & Amber glow */
+    /* Metrics Styling */
     [data-testid="stMetric"] {
-        background: rgba(255, 191, 0, 0.03);
-        border: 1px solid #FFBF00;
-        border-radius: 12px;
-        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+        background: rgba(0, 255, 255, 0.05);
+        border: 1px solid #00ffff;
+        border-radius: 10px;
     }
     
-    /* TYPOGRAPHY: Gold, Amber, and High-Res White */
-    h1, h2, h3 { color: #FFD700 !important; font-weight: 800; } /* Gold */
-    p, span, label { color: #FFBF00 !important; } /* Amber */
-    [data-testid="stMetricLabel"] > div { color: #FFBF00 !important; font-size: 1.1rem; }
-    [data-testid="stMetricValue"] > div { color: #FFFFFF !important; font-weight: 700; text-shadow: 1px 1px 2px #000; }
+    /* Cyan Text & High-Res White Values */
+    h1, h2, h3, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
+    [data-testid="stMetricValue"] > div { color: #ffffff !important; font-weight: 700; }
     
-    /* TAB STYLING */
-    .stTabs [data-baseweb="tab"] { color: #FFBF00; font-weight: bold; }
-    .stTabs [aria-selected="true"] { border-bottom-color: #FFD700 !important; color: #FFD700 !important; }
-    
-    /* 3. LOGO CONTAINER: Isolation & Focus */
-    .logo-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        padding: 50px 0;
-        background: linear-gradient(180deg, #0A0A0A 0%, #151515 100%);
-        border-bottom: 1px solid #222;
-        margin-bottom: 30px;
-    }
-    .eagle-ring {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
-        background-color: #000;
-        border: 4px solid #FFD700; /* Gold Ring */
-        
-        /* The Glow (Defining the center) */
-        box-shadow: 0px 0px 60px rgba(0, 255, 255, 0.6); 
-        margin-bottom: 20px;
-    }
-    .eagle-icon {
-        color: #FFD700; /* Antique Gold */
-        font-size: 80px;
-        font-weight: 900;
-        text-shadow: 0px 0px 10px rgba(0, 255, 255, 0.8);
-    }
-    .reqxi-text {
-        color: #FFFFFF; /* High-Res White */
-        font-size: 55px;
-        font-weight: 800;
-        letter-spacing: -2px;
-        text-transform: uppercase;
-        text-shadow: 0px 0px 15px rgba(255, 215, 0, 0.6);
-    }
+    /* Tab Styling */
+    .stTabs [data-baseweb="tab"] { color: #00ffff; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# 4. ENHANCED BRANDING HEADER (Defining the Eagle)
-st.markdown("""
-    <div class="logo-container">
-        <div class="eagle-ring">
-            <span class="eagle-icon">🦅</span>
-        </div>
-        <span class="reqxi-text">REQXI</span>
-    </div>
-    """, unsafe_allow_html=True)
+# 3. BRANDING HEADER (Focused on the Eagle)
+col_a, col_b = st.columns([1, 3])
+with col_a:
+    if os.path.exists("reqxi.jpg"):
+        st.image("reqxi.jpg", width=150)
+with col_b:
+    st.write("###") # Vertical spacer
+    st.markdown("<h1 style='font-size: 60px; margin-top: -20px;'>REQXI</h1>", unsafe_allow_html=True)
+    st.caption("Precision Intelligence // IT Consulting // Data Research")
 
-# 5. BUSINESS & MARKET DATA (Simulated)
-st.markdown("#### 📈 GLOBAL MARKET INTELLIGENCE")
+# 4. MARKET INTELLIGENCE TICKER
+st.markdown("#### 📈 MARKET DATA")
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("WTI CRUDE", "$79.12", "+1.4%")
-m2.metric("NASDAQ 100", "18,240", "+0.8%")
-m3.metric("BTC/USD", "$64,210", "+2.1%")
-m4.metric("US 10Y YIELD", "4.22%", "-0.05%")
+m2.metric("ERCOT LOAD", "44.2 GW", "WATCH")
+m3.metric("FEDEX (FDX)", "$254.10", "STABLE")
+m4.metric("NASDAQ 100", "18,240", "+0.8%")
 st.divider()
 
-# 6. NAVIGATION TABS
-t1, t2, t3, t4 = st.tabs(["📊 Air & Grid", "🚀 Join Us", "🤝 Support", "🛡️ Resilience Monitor"])
+# 5. NAVIGATION TABS
+t1, t2, t3, t4 = st.tabs(["📊 Intelligence", "🚀 Careers", "🤝 Support", "🛡️ Risk Monitor"])
 
 with t1:
-    st.subheader("🌐 Community Intelligence Feed")
+    st.subheader("🌐 Global Environment & Air Quality")
     
-    def get_community_data(lat, lon):
+    def get_data(lat, lon):
         try:
-            url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m&current=us_aqi&temperature_unit=fahrenheit"
-            aq_url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=us_aqi,pm2_5"
-            w = requests.get(url, timeout=5).json()['current']
-            aq = requests.get(aq_url, timeout=5).json()['current']
-            return {"t": f"{w['temperature_2m']}°F", "h": f"{w['relative_humidity_2m']}%", "aqi": aq['us_aqi'], "pm": f"{aq['pm2_5']} µg/m³"}
-        except: return {"t": "--", "h": "--", "aqi": "--", "pm": "--"}
+            w_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m&temperature_unit=fahrenheit"
+            aq_url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=us_aqi"
+            w = requests.get(w_url, timeout=5).json()['current']
+            a = requests.get(aq_url, timeout=5).json()['current']
+            return {"t": f"{w['temperature_2m']}°", "h": f"{w['relative_humidity_2m']}%", "aq": a['us_aqi']}
+        except: return {"t": "--", "h": "--", "aq": 0}
 
+    # 10 State Cities
     cities = {
-        "Fort Worth, TX": (32.75, -97.33), "Houston, TX": (29.76, -95.36),
-        "Atlanta, GA": (33.74, -84.38), "Chicago, IL": (41.87, -87.62)
+        "Miami, FL": (25.76, -80.19), "Fort Worth, TX": (32.75, -97.33), 
+        "Charlotte, NC": (35.22, -80.84), "New York, NY": (40.71, -74.00),
+        "Chicago, IL": (41.87, -87.62), "Los Angeles, CA": (34.05, -118.24),
+        "Las Vegas, NV": (36.17, -115.13), "Charleston, SC": (32.77, -79.93),
+        "Atlanta, GA": (33.74, -84.38), "Seattle, WA": (47.60, -122.33)
     }
 
+    map_list = []
     for city, coords in cities.items():
-        d = get_community_data(coords[0], coords[1])
-        st.markdown(f"### {city}")
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("AQI (US)", d['aqi'])
-        c2.metric("PM2.5 (Soot)", d['pm'])
+        d = get_data(coords[0], coords[1])
+        c1, c2, c3, c4 = st.columns([2, 1, 1, 1])
+        c1.write(f"**{city}**")
+        c2.metric("AQI", d['aq'])
         c3.metric("Temp", d['t'])
-        c4.metric("Humidity", d['h'])
-        st.divider()
+        c4.metric("Humid", d['h'])
+        map_list.append({"name": city, "lat": coords[0], "lon": coords[1], "aqi": d['aq']})
+    
+    st.divider()
+    st.markdown("### 🗺️ Geospatial Risk Map")
+    st.pydeck_chart(pdk.Deck(
+        map_style='mapbox://styles/mapbox/dark-v11',
+        initial_view_state=pdk.ViewState(latitude=37.0902, longitude=-95.7129, zoom=3, pitch=45),
+        layers=[
+            pdk.Layer('ColumnLayer', data=pd.DataFrame(map_list), get_position=['lon', 'lat'], 
+                      get_elevation='aqi', elevation_scale=1000, radius=30000, 
+                      get_fill_color=[0, 255, 255, 180], pickable=True)
+        ]
+    ))
 
 with t2:
     st.subheader("🚀 Careers")
     st.markdown("### **Senior Data Engineer (L3)**")
-    st.write("Join the lead team for real-time ETL and hazard modeling.")
-    st.markdown("**Justin@jbs-t.com**")
+    st.info("Justin@jbs-t.com")
 
 with t3:
-    st.subheader("🤝 Research Funding")
-    st.progress(0.65)
+    st.subheader("🤝 Support Research")
     if os.path.exists("$jbstpay.svg"):
         st.image("$jbstpay.svg", width=250)
-    st.markdown('<a href="https://cash.app/$jbstpay" target="_blank"><button style="background-color:#FFD700; color:black; border:none; padding:15px 30px; border-radius:8px; font-weight:bold; cursor:pointer;">💸 Cash App Donation</button></a>', unsafe_allow_html=True)
+    st.markdown('<a href="https://cash.app/$jbstpay" target="_blank"><button style="background-color:#00ffff; color:black; border:none; padding:15px; border-radius:5px; font-weight:bold; cursor:pointer;">💸 Cash App</button></a>', unsafe_allow_html=True)
 
 with t4:
-    st.subheader("🛡️ Resilience Monitor")
+    st.subheader("🛡️ 10-State Risk & Grid Monitor")
     risk_df = pd.DataFrame({
-        "Hub": ["Houston", "Fort Worth", "Atlanta", "Chicago"],
-        "Threat Level": ["Extreme", "High", "Moderate", "High"],
-        "Risk Factor": ["Flood/Hurricane", "Severe Storm", "Inland Flood", "Heat/Grid"]
+        "Hub": ["LA", "FTW", "LV", "NYC", "CHI", "CLT", "CHS", "ATL", "MIA", "SEA"],
+        "Grid": ["Watch", "High", "Heat", "High", "Stable", "Stable", "Flood", "Mod", "Crit", "Stable"],
+        "Risk": ["Wildfire", "Storm", "Thermal", "Load", "Congest", "Wind", "Surge", "Rain", "Hurricane", "Seismic"]
     })
     st.table(risk_df)
 
