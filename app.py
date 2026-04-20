@@ -6,98 +6,85 @@ import os
 # 1. PAGE SETUP
 st.set_page_config(page_title="REQXI PRO", layout="wide")
 
-# 2. MELANIN-OPTIMIZED CSS (Warm High-Contrast)
+# 2. THE SIGNATURE LOOK (Reverted to Cyan & Black)
 st.markdown("""
     <style>
     header, [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton {display: none;}
     footer {visibility: hidden;}
-    
-    /* BASE: Deep Charcoal for better eye comfort */
-    .main { background-color: #0A0A0A; }
-    
-    /* CARDS: Warm Mocha & Amber glow */
+    .main { background-color: #010408; }
     [data-testid="stMetric"] {
-        background: rgba(255, 191, 0, 0.03);
-        border: 1px solid #FFBF00;
-        border-radius: 12px;
-        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+        background: rgba(0, 255, 255, 0.05);
+        border: 1px solid #00ffff;
+        border-radius: 10px;
     }
-    
-    /* TYPOGRAPHY: Gold, Amber, and High-Res White */
-    h1, h2, h3 { color: #FFD700 !important; font-weight: 800; } /* Gold */
-    p, span, label { color: #FFBF00 !important; } /* Amber */
-    [data-testid="stMetricLabel"] > div { color: #FFBF00 !important; font-size: 1.1rem; }
-    [data-testid="stMetricValue"] > div { color: #FFFFFF !important; font-weight: 700; text-shadow: 1px 1px 2px #000; }
-    
-    /* TAB STYLING */
-    .stTabs [data-baseweb="tab"] { color: #FFBF00; font-weight: bold; }
-    .stTabs [aria-selected="true"] { border-bottom-color: #FFD700 !important; color: #FFD700 !important; }
+    h1, h2, h3, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
+    [data-testid="stMetricValue"] > div { color: #ffffff !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. BRANDING
+# 3. BRANDING HEADER
 if os.path.exists("reqxi.jpg"):
-    st.image("reqxi.jpg", width=520)
+    st.image("reqxi.jpg", width=500)
 
-# 4. TABS
-t1, t2, t3, t4 = st.tabs(["📊 Air & Grid", "🚀 Careers", "🤝 Support", "🛡️ Risk"])
+# 4. NAVIGATION TABS
+t1, t2, t3, t4 = st.tabs(["📊 Intelligence", "🚀 Careers", "🤝 Donations", "🛡️ Risk Monitor"])
 
 with t1:
-    st.subheader("🌐 Community Intelligence Feed")
+    st.subheader("🌐 Global Environment & Air Quality")
     
-    def get_community_data(lat, lon):
+    def get_full_data(lat, lon):
         try:
-            # Weather + Air Quality (AQI)
-            url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m&hourly=us_aqi,pm2_5&forecast_days=1"
-            aq_url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=us_aqi,pm2_5"
+            # Weather API
+            w_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&temperature_unit=fahrenheit"
+            # Air Quality API
+            a_url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=us_aqi"
             
-            w = requests.get(url, timeout=5).json()
-            aq = requests.get(aq_url, timeout=5).json()
+            w = requests.get(w_url, timeout=5).json()['current']
+            a = requests.get(a_url, timeout=5).json()['current']
             
-            return {
-                "t": f"{w['current']['temperature_2m']}°F",
-                "h": f"{w['current']['relative_humidity_2m']}%",
-                "aqi": aq['current']['us_aqi'],
-                "pm": f"{aq['current']['pm2_5']} µg/m³"
-            }
-        except: return {"t": "--", "h": "--", "aqi": "--", "pm": "--"}
+            return {"t": f"{w['temperature_2m']}°F", "h": f"{w['relative_humidity_2m']}%", "w": f"{w['wind_speed_10m']} mph", "aq": a['us_aqi']}
+        except: return {"t": "--", "h": "--", "w": "--", "aq": "--"}
 
     cities = {
-        "Fort Worth, TX": (32.75, -97.33), "Houston, TX": (29.76, -95.36),
-        "Atlanta, GA": (33.74, -84.38), "Chicago, IL": (41.87, -87.62)
+        "Miami, FL": (25.76, -80.19), "Fort Worth, TX": (32.75, -97.33), 
+        "Houston, TX": (29.76, -95.36), "New York, NY": (40.71, -74.00),
+        "Chicago, IL": (41.87, -87.62), "Charlotte, NC": (35.22, -80.84)
     }
 
     for city, coords in cities.items():
-        d = get_community_data(coords[0], coords[1])
+        d = get_full_data(coords[0], coords[1])
         st.markdown(f"### {city}")
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Air Quality (US AQI)", d['aqi'])
-        c2.metric("PM2.5 (Fine Soot)", d['pm'])
-        c3.metric("Heat Index", d['t'])
-        c4.metric("Humidity", d['h'])
+        c1.metric("Air Quality (AQI)", d['aq'])
+        c2.metric("Temp", d['t'])
+        c3.metric("Humidity", d['h'])
+        c4.metric("Wind", d['w'])
         st.divider()
 
 with t2:
-    st.subheader("🚀 Join REQXI")
+    st.subheader("🚀 Careers")
     st.markdown("### **Senior Data Engineer (L3)**")
-    st.info("Comp: Based on Experience. Focus: Community Resilience Data.")
-    st.markdown("**Justin@jbs-t.com**")
+    st.write("**Pay:** Based on Experience")
+    st.markdown("**Email Resume:** justin@jbs-t.com")
 
 with t3:
-    st.subheader("🤝 Research Funding")
+    st.subheader("🤝 Support Research")
     st.progress(0.65)
     if os.path.exists("$jbstpay.svg"):
         st.image("$jbstpay.svg", width=250)
-    st.markdown('<a href="https://cash.app/$jbstpay" target="_blank"><button style="background-color:#FFD700; color:black; border:none; padding:15px 30px; border-radius:8px; font-weight:bold; cursor:pointer;">💸 Cash App Donation</button></a>', unsafe_allow_html=True)
+    st.markdown('<a href="https://cash.app/$jbstpay" target="_blank"><button style="background-color:#00ffff; color:black; border:none; padding:12px 24px; border-radius:5px; font-weight:bold; cursor:pointer;">💸 Donate via Cash App</button></a>', unsafe_allow_html=True)
 
 with t4:
-    st.subheader("🛡️ Resilience Monitor")
-    risk_df = pd.DataFrame({
-        "Market": ["Houston", "Fort Worth", "Atlanta", "Chicago"],
-        "AQI Threat": ["Severe", "High", "Moderate", "High"],
-        "Grid Risk": ["Critical", "High", "Low", "Moderate"]
-    })
-    st.table(risk_df)
+    st.subheader("🛡️ Multi-State Risk & Grid Monitor")
+    
+    # Expanded Grid Data for CA, TX, NV, NC, SC + Major Hubs
+    risk_data = {
+        "Region / Hub": ["Houston (TX)", "Fort Worth (TX)", "Las Vegas (NV)", "Los Angeles (CA)", "Charlotte (NC)", "Charleston (SC)", "Chicago (IL)", "NYC (NY)"],
+        "Grid Status": ["Stable", "High Load", "Extreme Heat Watch", "Watch", "Stable", "Coastal Risk", "Stable", "High Load"],
+        "Primary Risk": ["Hurricane", "Severe Storm", "Thermal Stress", "Seismic/Wildfire", "Wind", "Flood/Surge", "Grid Congestion", "Infrastructure Age"],
+        "Threat Level": ["Critical", "High", "Moderate", "High", "Low", "Extreme", "Moderate", "High"]
+    }
+    st.table(pd.DataFrame(risk_data))
 
 st.divider()
-st.caption("Confidential // REQXI IT & Community Intelligence Operations")
+st.caption("Confidential // REQXI IT Consulting & Data Research")
