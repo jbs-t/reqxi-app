@@ -7,38 +7,36 @@ import os
 # 1. PAGE SETUP
 st.set_page_config(page_title="REQXI PRO", layout="wide")
 
-# 2. THE SIGNATURE LOOK (Cyan & Black)
+# 2. SIGNATURE CYAN & BLACK THEME
 st.markdown("""
     <style>
     header, [data-testid="stHeader"], [data-testid="stToolbar"], .stDeployButton {display: none;}
     footer {visibility: hidden;}
     .main { background-color: #010408; }
     
-    /* Metrics Styling */
+    /* Metric Cards */
     [data-testid="stMetric"] {
         background: rgba(0, 255, 255, 0.05);
         border: 1px solid #00ffff;
         border-radius: 10px;
     }
     
-    /* Cyan Text & High-Res White Values */
+    /* Text Colors */
     h1, h2, h3, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
     [data-testid="stMetricValue"] > div { color: #ffffff !important; font-weight: 700; }
     
-    /* Tab Styling */
+    /* Clean Tab Navigation */
     .stTabs [data-baseweb="tab"] { color: #00ffff; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. BRANDING HEADER (Focused on the Eagle)
-col_a, col_b = st.columns([1, 3])
-with col_a:
-    if os.path.exists("reqxi.jpg"):
-        st.image("reqxi.jpg", width=150)
-with col_b:
-    st.write("###") # Vertical spacer
-    st.markdown("<h1 style='font-size: 60px; margin-top: -20px;'>REQXI</h1>", unsafe_allow_html=True)
-    st.caption("Precision Intelligence // IT Consulting // Data Research")
+# 3. SINGLE LOGO HEADER (No duplication)
+logo_path = "rex.jpg" # Using your specific filename
+
+if os.path.exists(logo_path):
+    st.image(logo_path, width=600) # This shows the full logo + text as one image
+else:
+    st.title("REQXI PRO")
 
 # 4. MARKET INTELLIGENCE TICKER
 st.markdown("#### 📈 MARKET DATA")
@@ -98,7 +96,8 @@ with t1:
 with t2:
     st.subheader("🚀 Careers")
     st.markdown("### **Senior Data Engineer (L3)**")
-    st.info("Justin@jbs-t.com")
+    st.write("Specializing in Geospatial Intelligence.")
+    st.markdown("**Justin@jbs-t.com**")
 
 with t3:
     st.subheader("🤝 Support Research")
