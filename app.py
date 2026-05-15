@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 import os
 
-# 1. PAGE SETUP
+# 1. PAGE SETUP (Must be the first Streamlit command)
 st.set_page_config(page_title="REQXI PRO", layout="wide")
 
 # 2. SIGNATURE CYAN & BLACK THEME
@@ -18,11 +18,17 @@ st.markdown("""
         background: rgba(0, 255, 255, 0.05);
         border: 1px solid #00ffff;
         border-radius: 10px;
+        padding: 10px;
     }
     
     /* Text Colors */
-    h1, h2, h3, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
+    h1, h2, h3, h4, p, span, label, [data-testid="stMetricLabel"] > div { color: #00ffff !important; }
     [data-testid="stMetricValue"] > div { color: #ffffff !important; }
+    
+    /* Tab Styling */
+    .stTabs [data-baseweb="tab-list"] button [data-testid="stWidgetLabel"] p {
+        color: #00ffff;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -31,8 +37,10 @@ col_a, col_b = st.columns([3, 1])
 with col_a:
     if os.path.exists("reqxi.jpg"):
         st.image("reqxi.jpg", width=480)
+    else:
+        st.title("REQXI PRO")
 with col_b:
-    st.write("###") # Spacer
+    st.write("###") 
     st.markdown("""
         <a href="mailto:justin@jbs-t.com" style="text-decoration:none;">
             <button style="background-color:#00ffff; color:black; border:none; padding:15px; border-radius:5px; font-weight:bold; width:100%; cursor:pointer;">
@@ -41,7 +49,7 @@ with col_b:
         </a>
     """, unsafe_allow_html=True)
 
-# 4. BUSINESS & MARKET DATA (Substance)
+# 4. BUSINESS & MARKET DATA
 st.markdown("#### 📈 GLOBAL MARKET INTELLIGENCE")
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("WTI CRUDE", "$79.12", "+1.4%")
@@ -58,14 +66,14 @@ with t1:
     
     def get_data(lat, lon):
         try:
-            w_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m&current=us_aqi&temperature_unit=fahrenheit"
+            w_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m&temperature_unit=fahrenheit"
             aq_url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=us_aqi"
             w = requests.get(w_url, timeout=5).json()['current']
             a = requests.get(aq_url, timeout=5).json()['current']
             return {"t": f"{w['temperature_2m']}°", "h": f"{w['relative_humidity_2m']}%", "aq": a['us_aqi']}
-        except: return {"t": "--", "h": "--", "aq": "--"}
+        except: 
+            return {"t": "--", "h": "--", "aq": "--"}
 
-    # 10 State Intelligence Feed
     cities = {
         "Los Angeles, CA": (34.05, -118.24), "Fort Worth, TX": (32.75, -97.33), 
         "Las Vegas, NV": (36.17, -115.13), "New York, NY": (40.71, -74.00),
